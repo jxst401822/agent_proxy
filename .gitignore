@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# 环境配置(含密钥,勿提交)
+.env
+
+# 日志与缓存
+*.log
+.DS_Store
