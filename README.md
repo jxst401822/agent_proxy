@@ -25,25 +25,38 @@ agent_proxy/
 │   ├── main.py        # FastAPI 应用入口:路由、CORS、http 客户端生命周期
 │   ├── config.py      # 配置(上游地址、端口、超时、CORS)
 │   └── proxy.py       # 核心转发:认证检查 + httpx 转发 + SSE 流式透传
-├── requirements.txt
+├── pyproject.toml   # uv 依赖与项目声明
 ├── .env.example
 └── README.md
 ```
 
 ## 快速开始
 
+项目采用 [uv](https://docs.astral.sh/uv/) 管理依赖与运行(依赖声明见 `pyproject.toml`)。
+
 ```bash
-# 1. 安装依赖
-pip install -r requirements.txt
+# 1. 安装依赖并创建虚拟环境(生成 .venv 与 uv.lock)
+uv sync
 
 # 2. 配置(可选,复制 .env.example 为 .env 修改)
 cp .env.example .env
 
 # 3. 启动网关
-uvicorn app.main:app --host 0.0.0.0 --port 8000
+uv run uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
-或以 `python -m uvicorn app.main:app --reload` 进入热重载开发模式。
+或以 `uv run uvicorn app.main:app --reload` 进入热重载开发模式。
+
+> **离线/受限网络环境**:若机器无法访问 PyPI(如内网),可复用系统已安装的依赖,
+> 创建继承系统包的虚拟环境后以 `--no-sync` 跳过联网同步:
+>
+> ```bash
+> uv venv --system-site-packages --python C:/Python314/python.exe
+> uv run --no-sync uvicorn app.main:app --host 0.0.0.0 --port 8000
+> ```
+>
+> 注意:由于无法联网获取包元数据,离线环境下不会生成 `uv.lock`;待网络恢复后执行
+> `uv sync` 即可补齐锁文件并进入标准的 uv 工作流。
 
 ## 内网客户端调用示例
 

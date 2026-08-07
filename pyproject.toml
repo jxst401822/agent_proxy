@@ -1,0 +1,17 @@
+[project]
+name = "agent-proxy"
+version = "0.1.0"
+description = "百炼(DashScope)兼容转发网关:对内网呈现与阿里云百炼一致的 API,透明转发到真实上游并支持流式 SSE。"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "httpx",
+    "pydantic-settings",
+    "python-dotenv",
+]
+
+# 本项目为源码目录运行模式,不作为可安装包构建;
+# uv run 直接使用 ./app 下的源码。
+[tool.uv]
+package = false
