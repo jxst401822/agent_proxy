@@ -45,7 +45,16 @@ cp .env.example .env
 uv run python -m app.main
 ```
 
-也可直接运行启动脚本(git bash/Linux 用 `./run.sh`,Windows 用 `run.bat`)。
+也可直接运行启动脚本(**后台运行**,git bash/Linux 用 `./run.sh`,Windows 用 `run.bat`):
+
+```bash
+./run.sh start     # 后台启动,日志写入 logs/gateway.log
+./run.sh status    # 查看运行状态
+./run.sh stop      # 停止
+./run.sh restart   # 重启
+```
+
+> Windows 下 `run.bat` 同样后台启动;如需停止,在 git bash 中执行 `./run.sh stop` 或用 `taskkill /F /IM python.exe`。
 
 > 启动方式说明:
 > - `uv run python -m app.main` —— **读取 `.env` 中的 `HOST` / `PORT`**(如上例监听 `0.0.0.0:8002`),推荐使用。

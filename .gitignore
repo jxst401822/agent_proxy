@@ -9,5 +9,7 @@ venv/
 .env
 
 # 日志与缓存
+logs/
 *.log
+.gateway.pid
 .DS_Store
