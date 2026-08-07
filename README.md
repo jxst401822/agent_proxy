@@ -45,6 +45,8 @@ cp .env.example .env
 uv run python -m app.main
 ```
 
+也可直接运行启动脚本(git bash/Linux 用 `./run.sh`,Windows 用 `run.bat`)。
+
 > 启动方式说明:
 > - `uv run python -m app.main` —— **读取 `.env` 中的 `HOST` / `PORT`**(如上例监听 `0.0.0.0:8002`),推荐使用。
 > - `uv run uvicorn app.main:app --host ... --port ...` —— 直接以命令行参数启动,此时端口由 `--port` 决定(默认 `8000`),**与 `.env` 无关**。热重载开发可用 `uv run uvicorn app.main:app --reload`。
