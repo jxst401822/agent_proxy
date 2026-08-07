@@ -1,0 +1,153 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-0000-4000-8000-000000000001",
+    "name": "百炼兼容转发网关 (DashScope Compatible Gateway)",
+    "description": "对内网呈现与阿里云百炼(DashScope)一致的 API 形态,透明转发到真实上游并支持流式 SSE。\n\n导入后请先在「环境」中设置 base_url 与 api_key 两个变量(或直接在集合根变量编辑)。\n- base_url: 网关地址,默认 http://localhost:8002(PORT 来自 .env)\n- api_key:  你的百炼 API Key(sk-...)\n\n认证:集合级 Bearer Token 自动注入 Authorization 头,值为 {{api_key}}。",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      { "key": "token", "value": "{{api_key}}", "type": "string" }
+    ]
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8002" },
+    { "key": "api_key", "value": "sk-REPLACE_ME" },
+    { "key": "model", "value": "qwen-plus" }
+  ],
+  "item": [
+    {
+      "name": "0. 健康检查",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{base_url}}/health", "host": ["{{base_url}}"], "path": ["health"] }
+      }
+    },
+    {
+      "name": "1. OpenAI 兼容模式 (/compatible-mode/v1)",
+      "item": [
+        {
+          "name": "对话补全 —— 同步 chat/completions",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"model\": \"{{model}}\",\n    \"messages\": [\n        { \"role\": \"system\", \"content\": \"你是智能助手\" },\n        { \"role\": \"user\", \"content\": \"你好\" }\n    ],\n    \"temperature\": 0.7\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/compatible-mode/v1/chat/completions", "host": ["{{base_url}}"], "path": ["compatible-mode", "v1", "chat", "completions"] }
+          }
+        },
+        {
+          "name": "对话补全 —— 流式 SSE (stream: true)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"model\": \"{{model}}\",\n    \"messages\": [\n        { \"role\": \"user\", \"content\": \"讲个笑话\" }\n    ],\n    \"stream\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/compatible-mode/v1/chat/completions", "host": ["{{base_url}}"], "path": ["compatible-mode", "v1", "chat", "completions"] }
+          }
+        },
+        {
+          "name": "模型列表 models",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/compatible-mode/v1/models", "host": ["{{base_url}}"], "path": ["compatible-mode", "v1", "models"] }
+          }
+        },
+        {
+          "name": "向量化 embeddings",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"model\": \"text-embedding-v3\",\n    \"input\": [\"你好\", \"hello world\"]\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/compatible-mode/v1/embeddings", "host": ["{{base_url}}"], "path": ["compatible-mode", "v1", "embeddings"] }
+          }
+        },
+        {
+          "name": "Responses 接口 responses",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"model\": \"{{model}}\",\n    \"input\": \"你好\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/compatible-mode/v1/responses", "host": ["{{base_url}}"], "path": ["compatible-mode", "v1", "responses"] }
+          }
+        },
+        {
+          "name": "无认证请求(应返回 401)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"model\": \"{{model}}\",\n    \"messages\": [ { \"role\": \"user\", \"content\": \"hi\" } ]\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/compatible-mode/v1/chat/completions", "host": ["{{base_url}}"], "path": ["compatible-mode", "v1", "chat", "completions"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. 原生 DashScope 模式 (/api/v1)",
+      "item": [
+        {
+          "name": "纯文本生成 text-generation",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"model\": \"{{model}}\",\n    \"input\": {\n        \"messages\": [ { \"role\": \"user\", \"content\": \"你好\" } ]\n    },\n    \"parameters\": {\n        \"result_format\": \"message\",\n        \"temperature\": 0.7\n    }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/api/v1/services/aigc/text-generation/generation", "host": ["{{base_url}}"], "path": ["api", "v1", "services", "aigc", "text-generation", "generation"] }
+          }
+        },
+        {
+          "name": "多模态生成 multimodal-generation",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"model\": \"qwen-vl-plus\",\n    \"input\": {\n        \"messages\": [\n            {\n                \"role\": \"user\",\n                \"content\": [\n                    { \"text\": \"这张图里是什么?\" },\n                    { \"image\": \"https://dashscope.oss-cn-beijing.aliyuncs.com/images/dog_and_girl.jpeg\" }\n                ]\n            }\n        ]\n    }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/api/v1/services/aigc/multimodal-generation/generation", "host": ["{{base_url}}"], "path": ["api", "v1", "services", "aigc", "multimodal-generation", "generation"] }
+          }
+        }
+      ]
+    }
+  ]
+}

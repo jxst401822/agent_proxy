@@ -155,6 +155,20 @@ curl -s http://<gateway>:8000/api/v1/services/aigc/text-generation/generation \
 > 提示:网关是**透明转发**,不解析请求体,因此原生模式(`input`/`parameters` 结构、`output.choices` 响应、
 > 流式 SSE)与 OpenAI 兼容模式的不同格式都能原样透传,无需额外适配。
 
+## Postman 调用示例
+
+导入 `postman_collection.json`(Postman → Import)即可获得覆盖网关全部 API 的示例集合,
+包含健康检查、OpenAI 兼容模式(同步/流式对话、模型列表、向量化、Responses、无认证 401 演示)、
+原生 DashScope 模式(纯文本/多模态生成)。
+
+使用前在集合变量中设置:
+- `base_url`:网关地址,默认 `http://localhost:8002`
+- `api_key`:`sk-你的百炼API-KEY`
+- `model`:默认 `qwen-plus`
+
+集合级 Bearer Token 会自动为每个请求注入 `Authorization: Bearer {{api_key}}`;
+「无认证请求」单独关闭了认证,用于验证网关返回 401。
+
 ## 认证说明
 
 网关采取**透传**模式:必须携带 `Authorization: Bearer <key>` 才会转发,否则返回 `401`。
