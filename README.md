@@ -38,14 +38,16 @@ agent_proxy/
 # 1. 安装依赖并创建虚拟环境(生成 .venv 与 uv.lock)
 uv sync
 
-# 2. 配置(可选,复制 .env.example 为 .env 修改)
+# 2. 配置(复制 .env.example 为 .env 修改,可设 HOST/PORT 等)
 cp .env.example .env
 
-# 3. 启动网关
-uv run uvicorn app.main:app --host 0.0.0.0 --port 8000
+# 3. 启动网关(推荐:监听地址与端口取自 .env 的 HOST/PORT)
+uv run python -m app.main
 ```
 
-或以 `uv run uvicorn app.main:app --reload` 进入热重载开发模式。
+> 启动方式说明:
+> - `uv run python -m app.main` —— **读取 `.env` 中的 `HOST` / `PORT`**(如上例监听 `0.0.0.0:8002`),推荐使用。
+> - `uv run uvicorn app.main:app --host ... --port ...` —— 直接以命令行参数启动,此时端口由 `--port` 决定(默认 `8000`),**与 `.env` 无关**。热重载开发可用 `uv run uvicorn app.main:app --reload`。
 
 > **离线/受限网络环境**:若机器无法访问 PyPI(如内网),可复用系统已安装的依赖,
 > 创建继承系统包的虚拟环境后以 `--no-sync` 跳过联网同步:

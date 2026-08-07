@@ -71,3 +71,11 @@ async def proxy_route(request: Request, path: str) -> Response:
 async def health() -> dict:
     """健康检查。"""
     return {"status": "ok"}
+
+
+if __name__ == "__main__":
+    # 让 .env 中的 HOST / PORT 生效:uvicorn 监听地址与端口取自配置。
+    # 启动方式: uv run python -m app.main
+    import uvicorn
+
+    uvicorn.run(app, host=settings.host, port=settings.port, log_level=settings.log_level)
